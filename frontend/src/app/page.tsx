@@ -1,6 +1,15 @@
 import AddTodoForm from "@/components/AddTodoForm";
 import { fetchJSON } from "@/lib/api";
-import { Typography, Box, Container } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Container,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Checkbox,
+} from "@mui/material";
 type Todo = { id: number; title: string };
 
 async function getTodos() {
@@ -19,13 +28,16 @@ export default async function Home() {
             No tasks yet.
           </Typography>
         ) : (
-          <ul className="list-disc pl-5 space-y-1">
+          <List>
             {todos.map((t) => (
-              <li key={t.id} className="text-base">
-                {t.title}
-              </li>
+              <ListItem key={t.id} className="text-base">
+                <ListItemIcon>
+                  <Checkbox edge="start" tabIndex={-1} disableRipple />
+                </ListItemIcon>
+                <ListItemText primary={t.title} />
+              </ListItem>
             ))}
-          </ul>
+          </List>
         )}
         <AddTodoForm />
       </Container>
