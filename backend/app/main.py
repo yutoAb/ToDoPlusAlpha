@@ -1,10 +1,19 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flasgger import Swagger
 import os
+import yaml
+from pathlib import Path
 
 def create_app():
     app = Flask(__name__)
     CORS(app, resources={r"/api/*": {"origins": "*"}})  # 開発中は * でOK。運用では限定推奨
+
+    # --- Swagger 設定を外部ファイルから読み込む ---
+    with open(Path(__file__).with_name("swagger.yml"), encoding="utf-8") as f:
+        swagger_template = yaml.safe_load(f)
+
+    swagger = Swagger(app, template=swagger_template)
 
     @app.get("/api/health")
     def health():

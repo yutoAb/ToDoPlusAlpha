@@ -1,0 +1,121 @@
+swagger: "2.0"
+info:
+  title: Todo API
+  version: "1.0.0"
+  description: Simple in-memory Todo API for development
+servers:
+  - url: http://localhost:5000
+    description: Local dev
+
+paths:
+  /api/health:
+    get:
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Service alive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+              examples:
+                ok:
+                  value:
+                    status: ok
+                    service: flask-backend
+
+  /api/todos:
+    get:
+      tags: [todos]
+      summary: List todos
+      responses:
+        "200":
+          description: Array of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Todo"
+              examples:
+                sample:
+                  value:
+                    - id: 1
+                      title: first task
+    post:
+      tags: [todos]
+      summary: Create a new todo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTodoInput"
+            examples:
+              sample:
+                value:
+                  title: buy milk
+      responses:
+        "201":
+          description: Created todo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+              examples:
+                sample:
+                  value:
+                    id: 2
+                    title: buy milk
+        "400":
+          description: Bad request (title is required)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                missingTitle:
+                  value:
+                    error: title is required
+
+components:
+  schemas:
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: flask-backend
+      required: [status, service]
+
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: first task
+      required: [id, title]
+
+    CreateTodoInput:
+      type: object
+      properties:
+        title:
+          type: string
+          example: buy milk
+      required: [title]
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: title is required
+      required: [error]
