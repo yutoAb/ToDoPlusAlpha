@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { API_BASE } from "@/lib/api";
-import { TextField } from "@mui/material";
+import { Stack, TextField, Button } from "@mui/material";
 
 export default function AddTodoForm() {
   const [title, setTitle] = useState("");
@@ -32,7 +32,7 @@ export default function AddTodoForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex gap-2 w-full sm:w-auto">
+    <Stack direction="row" spacing={1}>
       <TextField
         id="outlined-basic"
         label="新しいToDoを入力してください"
@@ -41,14 +41,11 @@ export default function AddTodoForm() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <button
-        className="border rounded px-3 py-1"
-        disabled={pending}
-        type="submit"
-      >
-        {pending ? "Adding..." : "Add"}
-      </button>
+
+      <Button variant="outlined" onClick={onSubmit}>
+        {pending ? "追加中..." : "追加"}
+      </Button>
       {error && <span className="text-red-500 text-sm">{error}</span>}
-    </form>
+    </Stack>
   );
 }
