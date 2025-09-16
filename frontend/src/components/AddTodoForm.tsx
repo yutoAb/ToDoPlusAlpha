@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { API_BASE } from "@/lib/api";
+import { TextField } from "@mui/material";
 
 export default function AddTodoForm() {
   const [title, setTitle] = useState("");
@@ -32,9 +33,11 @@ export default function AddTodoForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex gap-2 w-full sm:w-auto">
-      <input
-        className="border rounded px-2 py-1 flex-1"
-        placeholder="new task..."
+      <TextField
+        id="outlined-basic"
+        label="新しいToDoを入力してください"
+        fullWidth
+        variant="outlined"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
