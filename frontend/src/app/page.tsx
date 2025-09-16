@@ -1,6 +1,6 @@
 import AddTodoForm from "@/components/AddTodoForm";
 import { fetchJSON } from "@/lib/api";
-
+import { Typography, Box, Container } from "@mui/material";
 type Todo = { id: number; title: string };
 
 async function getTodos() {
@@ -11,29 +11,47 @@ export default async function Home() {
   const todos = await getTodos();
 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start w-full max-w-2xl">
-        <section className="w-full">
-          <h2 className="text-xl font-semibold mb-2">Todos</h2>
-          {todos.length === 0 ? (
-            <p className="text-sm text-gray-500">No tasks yet.</p>
-          ) : (
-            <ul className="list-disc pl-5 space-y-1">
-              {todos.map((t) => (
-                <li key={t.id} className="text-base">
-                  {t.title}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
+    <Box sx={{ pb: 8 /* フッター分の余白を確保 */ }}>
+      <Container component="main" sx={{ py: 4 }}>
+        <Typography variant={"h2"}>Todos</Typography>
+        {todos.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No tasks yet.
+          </Typography>
+        ) : (
+          <ul className="list-disc pl-5 space-y-1">
+            {todos.map((t) => (
+              <li key={t.id} className="text-base">
+                {t.title}
+              </li>
+            ))}
+          </ul>
+        )}
         <AddTodoForm />
-      </main>
+      </Container>
 
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-          <p>フッター</p>
-      </footer>
-    </div>
+      {/* footer 部分 */}
+      <Box
+        component="footer"
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          width: "100%",
+          display: "flex",
+          gap: 3,
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "center",
+          py: 2,
+          bgcolor: "background.paper",
+          boxShadow: 3,
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          フッター
+        </Typography>
+      </Box>
+    </Box>
   );
 }
