@@ -2,120 +2,137 @@ swagger: "2.0"
 info:
   title: Todo API
   version: "1.0.0"
-  description: Simple in-memory Todo API for development
-servers:
-  - url: http://localhost:5000
-    description: Local dev
+  description: Simple Todo API for development
+schemes:
+  - http
+host: localhost:5000
+basePath: /
 
 paths:
   /api/health:
     get:
       tags: [health]
       summary: Health check
+      produces:
+        - application/json
       responses:
         "200":
           description: Service alive
-          content:
+          schema:
+            $ref: "#/definitions/Health"
+          examples:
             application/json:
-              schema:
-                $ref: "#/components/schemas/Health"
-              examples:
-                ok:
-                  value:
-                    status: ok
-                    service: flask-backend
+              status: ok
+              service: flask-backend
 
   /api/todos:
     get:
       tags: [todos]
       summary: List todos
+      produces:
+        - application/json
       responses:
         "200":
           description: Array of todos
-          content:
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Todo"
+          examples:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Todo"
-              examples:
-                sample:
-                  value:
-                    - id: 1
-                      title: first task
+              - id: 1
+                title: first task
     post:
       tags: [todos]
       summary: Create a new todo
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateTodoInput"
-            examples:
-              sample:
-                value:
-                  title: buy milk
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/CreateTodoInput"
+          x-examples:
+            application/json:
+              title: buy milk
       responses:
         "201":
           description: Created todo
-          content:
+          schema:
+            $ref: "#/definitions/Todo"
+          examples:
             application/json:
-              schema:
-                $ref: "#/components/schemas/Todo"
-              examples:
-                sample:
-                  value:
-                    id: 2
-                    title: buy milk
+              id: 2
+              title: buy milk
         "400":
           description: Bad request (title is required)
-          content:
+          schema:
+            $ref: "#/definitions/Error"
+          examples:
             application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              examples:
-                missingTitle:
-                  value:
-                    error: title is required
+              error: title is required
 
-components:
-  schemas:
-    Health:
-      type: object
-      properties:
-        status:
-          type: string
-          example: ok
-        service:
-          type: string
-          example: flask-backend
-      required: [status, service]
-
-    Todo:
-      type: object
-      properties:
-        id:
+  /api/todos/{todo_id}:
+    delete:
+      tags: [todos]
+      summary: Delete a todo
+      parameters:
+        - in: path
+          name: todo_id
+          description: ID of the todo to delete
+          required: true
           type: integer
           format: int64
-          example: 1
-        title:
-          type: string
-          example: first task
-      required: [id, title]
+      responses:
+        "204":
+          description: Deleted (no content)
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+          examples:
+            application/json:
+              error: "todo id=9999 not found"
 
-    CreateTodoInput:
-      type: object
-      properties:
-        title:
-          type: string
-          example: buy milk
-      required: [title]
+definitions:
+  Health:
+    type: object
+    required: [status, service]
+    properties:
+      status:
+        type: string
+        example: ok
+      service:
+        type: string
+        example: flask-backend
 
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          example: title is required
-      required: [error]
+  Todo:
+    type: object
+    required: [id, title]
+    properties:
+      id:
+        type: integer
+        format: int64
+        example: 1
+      title:
+        type: string
+        example: first task
+
+  CreateTodoInput:
+    type: object
+    required: [title]
+    properties:
+      title:
+        type: string
+        example: buy milk
+
+  Error:
+    type: object
+    required: [error]
+    properties:
+      error:
+        type: string
+        example: title is required

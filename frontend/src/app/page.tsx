@@ -1,5 +1,6 @@
+"use client";
+
 import AddTodoForm from "@/components/AddTodoForm";
-import { fetchJSON } from "@/lib/api";
 import {
   Typography,
   Box,
@@ -9,34 +10,63 @@ import {
   ListItemIcon,
   ListItemText,
   Checkbox,
+  Button,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { fetcher } from "../../hooks/fetcher";
+import useSWR from "swr";
+
 type Todo = { id: number; title: string };
 
-async function getTodos() {
-  return fetchJSON<Todo[]>("/api/todos");
-}
+export default function Home() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
 
-export default async function Home() {
-  const todos = await getTodos();
+  const {
+    data: todos,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<Todo[]>(`${API_BASE}/api/todos`, fetcher);
+
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/todos/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+
+      await mutate();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Box sx={{ pb: 8 /* フッター分の余白を確保 */ }}>
       <Container component="main" sx={{ py: 4 }}>
         <Typography variant={"h2"}>Todos</Typography>
-        {todos.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            No tasks yet.
+        {todos && todos.length === 0 ? (
+          <Typography variant="h6" color="text.secondary">
+            タスクはありません．
           </Typography>
         ) : (
           <List>
-            {todos.map((t) => (
-              <ListItem key={t.id} className="text-base">
-                <ListItemIcon>
-                  <Checkbox edge="start" tabIndex={-1} disableRipple />
-                </ListItemIcon>
-                <ListItemText primary={t.title} />
-              </ListItem>
-            ))}
+            {todos &&
+              todos.map((t) => (
+                <ListItem key={t.id} className="text-base">
+                  <ListItemIcon>
+                    <Checkbox edge="start" tabIndex={-1} disableRipple />
+                  </ListItemIcon>
+                  <ListItemText primary={t.title} />
+                  <Button
+                    variant="outlined"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => handleDelete(t.id)}
+                  >
+                    削除
+                  </Button>
+                </ListItem>
+              ))}
           </List>
         )}
         <AddTodoForm />
