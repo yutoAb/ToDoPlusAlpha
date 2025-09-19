@@ -19,12 +19,27 @@ import useSWR from "swr";
 type Todo = { id: number; title: string };
 
 export default function Home() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
+
   const {
     data: todos,
     error,
     isLoading,
     mutate,
-  } = useSWR<Todo[]>(`${process.env.NEXT_PUBLIC_API_BASE}/api/todos`, fetcher);
+  } = useSWR<Todo[]>(`${API_BASE}/api/todos`, fetcher);
+
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/todos/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+
+      await mutate();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Box sx={{ pb: 8 /* フッター分の余白を確保 */ }}>
@@ -43,7 +58,11 @@ export default function Home() {
                     <Checkbox edge="start" tabIndex={-1} disableRipple />
                   </ListItemIcon>
                   <ListItemText primary={t.title} />
-                  <Button variant="outlined" startIcon={<DeleteIcon />}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => handleDelete(t.id)}
+                  >
                     Delete
                   </Button>
                 </ListItem>
