@@ -46,8 +46,8 @@ export default function Home() {
       <Container component="main" sx={{ py: 4 }}>
         <Typography variant={"h2"}>Todos</Typography>
         {todos && todos.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            No tasks yet.
+          <Typography variant="h6" color="text.secondary">
+            タスクはありません．
           </Typography>
         ) : (
           <List>
