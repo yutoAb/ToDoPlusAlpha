@@ -81,6 +81,24 @@ def create_app():
             session.commit()
 
         return jsonify({"id": new_id, "title": title}), 201
+    
+    @app.delete("/api/todos/<int:todo_id>")
+    def delete_todo(todo_id: int):
+        with SessionLocal() as session:
+            # DELETE ... RETURNING id で存在確認も兼ねる
+            result = session.execute(
+                sa.delete(todos_table)
+                .where(todos_table.c.id == todo_id)
+                .returning(todos_table.c.id)
+            )
+            deleted_id = result.scalar_one_or_none()
+            if deleted_id is None:
+                # 存在しないID
+                return jsonify(error=f"todo id={todo_id} not found"), 404
+
+            session.commit()
+        # 成功時は本体なしで204を返す
+        return ("", 204)
 
     return app
 
