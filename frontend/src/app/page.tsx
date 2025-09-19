@@ -9,7 +9,9 @@ import {
   ListItemIcon,
   ListItemText,
   Checkbox,
+  Button,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 type Todo = { id: number; title: string };
 
 async function getTodos() {
@@ -35,6 +37,9 @@ export default async function Home() {
                   <Checkbox edge="start" tabIndex={-1} disableRipple />
                 </ListItemIcon>
                 <ListItemText primary={t.title} />
+                <Button variant="outlined" startIcon={<DeleteIcon />}>
+                  Delete
+                </Button>
               </ListItem>
             ))}
           </List>
