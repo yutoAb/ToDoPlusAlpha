@@ -63,7 +63,7 @@ export default function Home() {
                     startIcon={<DeleteIcon />}
                     onClick={() => handleDelete(t.id)}
                   >
-                    Delete
+                    削除
                   </Button>
                 </ListItem>
               ))}
