@@ -1,5 +1,6 @@
+"use client";
+
 import AddTodoForm from "@/components/AddTodoForm";
-import { fetchJSON } from "@/lib/api";
 import {
   Typography,
   Box,
@@ -12,36 +13,41 @@ import {
   Button,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { fetcher } from "../../hooks/fetcher";
+import useSWR from "swr";
+
 type Todo = { id: number; title: string };
 
-async function getTodos() {
-  return fetchJSON<Todo[]>("/api/todos");
-}
-
-export default async function Home() {
-  const todos = await getTodos();
+export default function Home() {
+  const {
+    data: todos,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<Todo[]>(`${process.env.NEXT_PUBLIC_API_BASE}/api/todos`, fetcher);
 
   return (
     <Box sx={{ pb: 8 /* フッター分の余白を確保 */ }}>
       <Container component="main" sx={{ py: 4 }}>
         <Typography variant={"h2"}>Todos</Typography>
-        {todos.length === 0 ? (
+        {todos && todos.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No tasks yet.
           </Typography>
         ) : (
           <List>
-            {todos.map((t) => (
-              <ListItem key={t.id} className="text-base">
-                <ListItemIcon>
-                  <Checkbox edge="start" tabIndex={-1} disableRipple />
-                </ListItemIcon>
-                <ListItemText primary={t.title} />
-                <Button variant="outlined" startIcon={<DeleteIcon />}>
-                  Delete
-                </Button>
-              </ListItem>
-            ))}
+            {todos &&
+              todos.map((t) => (
+                <ListItem key={t.id} className="text-base">
+                  <ListItemIcon>
+                    <Checkbox edge="start" tabIndex={-1} disableRipple />
+                  </ListItemIcon>
+                  <ListItemText primary={t.title} />
+                  <Button variant="outlined" startIcon={<DeleteIcon />}>
+                    Delete
+                  </Button>
+                </ListItem>
+              ))}
           </List>
         )}
         <AddTodoForm />
